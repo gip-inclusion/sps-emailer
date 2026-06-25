@@ -1,0 +1,99 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "SPS conseiller email",
+  "type": "object",
+  "required": ["conseiller", "objet", "beneficiaires"],
+  "properties": {
+    "conseiller": {
+      "type": "object",
+      "required": ["ref", "nom", "email"],
+      "properties": {
+        "ref": {"type": "string"},
+        "nom": {"type": "string"},
+        "email": {"type": "string", "format": "email"},
+        "agence": {"type": ["string", "null"]}
+      }
+    },
+    "objet": {"type": "string"},
+    "intro": {"type": ["string", "null"]},
+    "remarques": {"type": ["array", "null"], "items": {"type": "string"}},
+    "beneficiaires": {"type": "array", "items": {"$ref": "#/$defs/beneficiaire"}}
+  },
+  "$defs": {
+    "richblock": {
+      "type": ["object", "null"],
+      "required": ["format", "content"],
+      "properties": {
+        "format": {"type": "string", "enum": ["markdown", "html"]},
+        "content": {"type": "string"}
+      }
+    },
+    "item": {
+      "type": "object",
+      "required": ["nom"],
+      "properties": {
+        "tension": {"type": ["string", "null"], "enum": ["vert","jaune","orange","rouge",null]},
+        "type_struct": {"type": ["string", "null"]},
+        "nom": {"type": "string"},
+        "structure": {"type": ["string", "null"]},
+        "adresse": {"type": ["string", "null"]},
+        "distance_km": {"type": ["number", "null"]},
+        "remote": {"type": ["boolean", "null"]},
+        "telephone": {"type": ["string", "null"]},
+        "email": {"type": ["string", "null"]},
+        "note": {"type": ["string", "null"]},
+        "url": {"type": ["string", "null"]},
+        "cta_label": {"type": ["string", "null"]}
+      }
+    },
+    "section": {
+      "type": "object",
+      "required": ["type", "items"],
+      "properties": {
+        "type": {"type": "string",
+          "examples": ["best_service","structures_iae","formation","dispositif","eligibilite","aucune_action"]},
+        "legende": {"type": ["string", "null"]},
+        "items": {"type": "array", "items": {"$ref": "#/$defs/item"}},
+        "aside": {"$ref": "#/$defs/richblock"},
+        "before_block": {"$ref": "#/$defs/richblock"},
+        "after_block": {"$ref": "#/$defs/richblock"},
+        "alternatives": {"type": ["array", "null"], "items": {"$ref": "#/$defs/item"}}
+      }
+    },
+    "groupe": {
+      "type": "object",
+      "required": ["titre", "sections"],
+      "properties": {
+        "titre": {"type": "string"},
+        "before_block": {"$ref": "#/$defs/richblock"},
+        "after_block": {"$ref": "#/$defs/richblock"},
+        "sections": {"type": "array", "items": {"$ref": "#/$defs/section"}}
+      }
+    },
+    "beneficiaire": {
+      "type": "object",
+      "required": ["de_id", "index", "groupes"],
+      "properties": {
+        "de_id": {"type": "string"},
+        "index": {"type": "integer"},
+        "nom": {"type": ["string", "null"]},
+        "age": {"type": ["integer", "null"]},
+        "cp": {"type": ["string", "null"]},
+        "commune": {"type": ["string", "null"]},
+        "dernier_entretien": {"type": ["string", "null"]},
+        "convocation": {
+          "type": ["object", "null"],
+          "properties": {"date": {"type": ["string","null"]}, "heure": {"type": ["string","null"]}}
+        },
+        "profil": {"type": "array", "items": {"type": "string"}},
+        "axes": {"type": "array", "items": {"type": "string"}},
+        "rome": {"type": ["object", "null"],
+          "properties": {"code": {"type": "string"}, "label": {"type": ["string","null"]}}},
+        "freins": {"type": "array", "items": {"type": "string"}},
+        "objectif": {"type": ["string", "null"]},
+        "avis_url": {"type": ["string", "null"]},
+        "groupes": {"type": "array", "items": {"$ref": "#/$defs/groupe"}}
+      }
+    }
+  }
+}
