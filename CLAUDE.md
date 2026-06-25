@@ -15,31 +15,34 @@ Les vrais noms n'existent que dans le **CSV réel non-anonymisé** (fourni par l
 ## Fichiers
 
 Pipeline `sps/` (CLI `uv run sps …`), une étape par module :
-- `sps/convert.py` — MD historique → **un JSON anonyme par conseiller** (`out/json/`).
 - `sps/deanon.py` — JSON anonyme + CSV réel → JSON nominatif (`out/json-nom/`). **Substitution déterministe par clé `de_id`, aucun LLM.**
 - `sps/render.py` + `sps/template.py` — JSON → **un HTML par conseiller** (`out/html/`).
-- `sps/brevo.py` — envoi / envoi programmé via l'API Brevo.
+- `sps/brevo.py` — envoi / envoi programmé / annulation via l'API Brevo.
 - `sps/schema.py` + `docs/schema/email.schema.json` — contrat JSON (donné à l'agent amont).
-- `data/` — entrées **sensibles, non versionnées** (CSV réel + anonymes + .md). `out/` — sorties (gitignoré).
+- `sps/convert.py` — **adaptateur legacy** MD→JSON, **plus le chemin nominal** (l'entrée attendue est du JSON).
+- `data/` — entrées **sensibles, non versionnées**. `out/` — entrées JSON + sorties (gitignoré).
 - `.env` — secrets (voir `.env.example`).
 
 ## Rendu / envoi
 
+Entrée nominale = **JSON** (un par conseiller, format `docs/schema/email.schema.json`) déposé dans `out/json/`. Procédure pas-à-pas : voir `README.md`. En bref :
+
 ```bash
 uv sync
-uv run sps convert  data/recos-lille-23juin-2026.md -o out/json/
-uv run sps deanon   out/json/ --csv data/Lille.csv   -o out/json-nom/   # optionnel ; --csv = le CSV réel du lot (Lille = exemple)
-uv run sps render   out/json-nom/                    -o out/html/
-uv run sps send     out/html/ --test                 # comptes de test (.env)
-uv run sps send     out/html/                         # vrais conseillers
-uv run sps schedule out/html/ --at 2026-06-29T07:00:00
+uv run sps deanon   out/json/ --csv <le-vrai.csv> -o out/json-nom/   # optionnel (vrais noms)
+uv run sps render   out/json-nom/                  -o out/html/      # ou out/json/ pour l'anonyme
+# tunnel SOCKS ouvert + BREVO_PROXY exporté (cf. ci-dessous), puis :
+uv run sps send     out/html/ --test                                  # comptes de test (.env)
+uv run sps send     out/html/                                         # vrais conseillers (e-mail embarqué)
+uv run sps schedule out/html/ --at 2026-06-29T07:00:00.000+02:00      # → runId
+uv run sps cancel   <runId>                                           # annule un programmé
 ```
 
 Débranchement : sans `deanon`, `render out/json/` produit des HTML anonymes (`Bénéficiaire #N`) envoyables en test.
 
 ## Format d'entrée
 
-Le contrat d'entrée est désormais **JSON** (un fichier par conseiller), défini dans `docs/schema/email.schema.json` et `docs/superpowers/specs/2026-06-24-sps-emails-pipeline-design.md` (§4). `convert` est l'adaptateur transitoire qui produit ce JSON depuis le MD historique. Points clés : `section.type` est une **string ouverte** (types inconnus → gabarit générique) ; contenus libres via blocs riches `aside`/`before_block`/`after_block` (`{format: markdown|html, content}`) ; intro + remarques portées par le template.
+Le contrat d'entrée est **JSON** (un fichier par conseiller), défini dans `docs/schema/email.schema.json` et `docs/superpowers/specs/2026-06-24-sps-emails-pipeline-design.md` (§4). Points clés : `section.type` est une **string ouverte** (types inconnus → gabarit générique) ; contenus libres via blocs riches `aside`/`before_block`/`after_block` (`{format: markdown|html, content}`) ; intro + remarques portées par le template. (`sps convert` reste un adaptateur legacy MD→JSON, hors chemin nominal.)
 
 ## Design des e-mails
 
