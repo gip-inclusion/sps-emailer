@@ -31,3 +31,12 @@ def test_cancel_in_subcommands():
 def test_cancel_help_has_run_id():
     r = run("cancel", "--help")
     assert r.returncode == 0 and "run_id" in r.stdout
+
+
+def test_purge_in_subcommands():
+    r = run("--help")
+    assert r.returncode == 0 and "purge" in r.stdout
+
+def test_purge_help_has_older_than():
+    r = run("purge", "--help")
+    assert r.returncode == 0 and "older-than" in r.stdout

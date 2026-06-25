@@ -36,6 +36,7 @@ uv run sps send     out/html/ --test                                  # comptes 
 uv run sps send     out/html/                                         # vrais conseillers (e-mail embarqué)
 uv run sps schedule out/html/ --at 2026-06-29T07:00:00.000+02:00      # → runId
 uv run sps cancel   <runId>                                           # annule un programmé
+uv run sps purge                                                      # efface les sorties nominatives > 7 j (confirmation)
 ```
 
 Débranchement : sans `deanon`, `render out/json/` produit des HTML anonymes (`Bénéficiaire #N`) envoyables en test.

@@ -69,6 +69,12 @@ uv run sps schedule out/html/ --at 2026-06-29T07:00:00.000+02:00
 uv run sps cancel <runId>
 ```
 
+**h. Purger les sorties nominatives** (hygiène vie privée — manuel, conseillé après envoi) :
+```bash
+uv run sps purge                      # out/json-nom + out/html de plus de 7 j (demande confirmation)
+uv run sps purge --older-than 0 -y    # tout, sans confirmation
+```
+
 ## Données & secrets
 
 - `out/` et `data/` : **non versionnés** (données personnelles) — y déposer JSON, CSV, sorties.

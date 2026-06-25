@@ -27,6 +27,12 @@ def main(argv=None):
     p.add_argument("run_id")
     p.add_argument("--via", help="Proxy egress (ex. socks5h://127.0.0.1:1080), sinon BREVO_PROXY")
 
+    p = sub.add_parser("purge", help="Efface les sorties nominatives anciennes (hygiène vie privée)")
+    p.add_argument("dirs", nargs="*", help="dossiers à purger (défaut : out/json-nom out/html)")
+    p.add_argument("--older-than", type=int, default=7, metavar="JOURS",
+                   help="seuil d'âge en jours (défaut 7)")
+    p.add_argument("-y", "--yes", action="store_true", help="ne pas demander confirmation")
+
     args = parser.parse_args(argv)
 
     if args.cmd == "convert":
@@ -46,6 +52,9 @@ def main(argv=None):
     elif args.cmd == "cancel":
         from sps.brevo import run_cancel
         run_cancel(args.run_id, proxy=getattr(args, "via", None))
+    elif args.cmd == "purge":
+        from sps.purge import run_purge
+        run_purge(args.dirs or None, older_than_days=args.older_than, assume_yes=args.yes)
 
 if __name__ == "__main__":
     sys.exit(main())
