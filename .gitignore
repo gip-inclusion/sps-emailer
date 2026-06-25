@@ -5,3 +5,7 @@ __pycache__/
 *.pyc
 .venv/
 .DS_Store
+
+# artefacts de session (périment) — gardés en local, hors repo
+docs/superpowers/
+docs/upstream-agent-prompt.md

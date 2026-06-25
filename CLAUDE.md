@@ -42,7 +42,7 @@ Débranchement : sans `deanon`, `render out/json/` produit des HTML anonymes (`B
 
 ## Format d'entrée
 
-Le contrat d'entrée est **JSON** (un fichier par conseiller), défini dans `docs/schema/email.schema.json` et `docs/superpowers/specs/2026-06-24-sps-emails-pipeline-design.md` (§4). Points clés : `section.type` est une **string ouverte** (types inconnus → gabarit générique) ; contenus libres via blocs riches `aside`/`before_block`/`after_block` (`{format: markdown|html, content}`) ; intro + remarques portées par le template. (`sps convert` reste un adaptateur legacy MD→JSON, hors chemin nominal.)
+Le contrat d'entrée est **JSON** (un fichier par conseiller), défini dans `docs/schema/email.schema.json`. Points clés : `section.type` est une **string ouverte** (types inconnus → gabarit générique) ; contenus libres via blocs riches `aside`/`before_block`/`after_block` (`{format: markdown|html, content}`) ; intro + remarques portées par le template. (`sps convert` reste un adaptateur legacy MD→JSON, hors chemin nominal.)
 
 ## Design des e-mails
 

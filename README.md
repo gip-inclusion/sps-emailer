@@ -73,6 +73,6 @@ uv run sps cancel <runId>
 
 - `out/` et `data/` : **non versionnés** (données personnelles) — y déposer JSON, CSV, sorties.
 - `.env` : secrets (clé Brevo, expéditeur, destinataires de test, coordonnées du tunnel).
-- Contrat JSON : `docs/schema/email.schema.json`. Conception : `docs/superpowers/specs/`.
+- Contrat JSON : `docs/schema/email.schema.json`.
 
 > `sps convert <md.md> -o <dir>` existe encore (adaptateur **legacy** MD→JSON) mais n'est **plus le chemin nominal** : l'entrée attendue est directement du JSON.
