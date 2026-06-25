@@ -1,6 +1,6 @@
 # sps-emails
 
-Génération et envoi d'e-mails de recommandations « structures IAE » (SPS) aux conseillers France Travail, via l'API Brevo.
+Génération et envoi d'e-mails de recommandations « solutions structurées » (SPS) à des conseillers en insertio socio-pro.
 
 ## Pipeline
 
