@@ -10,8 +10,20 @@ JSON (1 par conseiller) → `deanon` (optionnel, vrais noms, **sans LLM**) → `
 
 ```bash
 uv sync
-cp .env.example .env      # puis renseigner BREVO_API_KEY, BREVO_SENDER, TEST_RECIPIENTS, SPS_TUNNEL_*
+cp .env.example .env      # puis renseigner les variables ci-dessous
 ```
+
+### Variables d'environnement (`.env`) à remplir
+
+| Variable | Requise | Pour quoi |
+|---|---|---|
+| `BREVO_API_KEY` | oui (envoi) | clé API Brevo transactionnel |
+| `BREVO_SENDER` | oui (envoi) | e-mail expéditeur, **validé** dans Brevo |
+| `TEST_RECIPIENTS` | oui pour `--test` | destinataires de test (séparés par virgules) |
+| `SPS_TUNNEL_HOST` / `SPS_TUNNEL_USER` | oui (envoi) | box du tunnel SOCKS (egress IP fixe whitelistée Brevo) |
+| `BREVO_PROXY` | optionnel | proxy SOCKS (sinon utiliser `--via`) ; le tunnel doit être ouvert |
+
+`convert` / `deanon` / `render` ne nécessitent **aucune** variable (étapes locales) ; elles ne servent qu'à partir de `send` / `schedule` / `cancel`.
 
 ## 2. Où mettre les JSON
 
