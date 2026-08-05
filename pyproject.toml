@@ -5,7 +5,7 @@ description = "Génération et envoi d'e-mails de recommandations IAE (SPS) via 
 requires-python = ">=3.12"
 dependencies = [
     "httpx[socks]>=0.28.1",
-    "markdown>=3.6",
+    "markdown>=3.10.3",
     "jsonschema>=4.21",
 ]
 
