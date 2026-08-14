@@ -1,3 +1,4 @@
+import html as _html
 import json
 import os
 import re
@@ -17,7 +18,8 @@ def validate_scheduled_at(value):
 
 def _title(html):
     m = re.search(r"<title>(.*?)</title>", html, re.S | re.I)
-    return m.group(1).strip() if m else "Recommandations structures IAE"
+    # le <title> est HTML-échappé ; le sujet est du texte brut → dé-échapper (d&#x27; → d')
+    return _html.unescape(m.group(1).strip()) if m else "Recommandations structures IAE"
 
 
 def _resolve_proxy(proxy=None):
@@ -54,11 +56,16 @@ def _lookup_run(path, run_id):
     return None
 
 
-def recipients_for(conseiller_email, test):
+def recipients_for(embedded_emails, test):
+    """Destinataires réels d'un HTML. `embedded_emails` = tous les `<!-- to: … -->` du HTML.
+    En réel : un envoi individuel par destinataire (dédupliqué, ordre préservé).
+    En test : les TEST_RECIPIENTS."""
     if test:
         raw = os.environ.get("TEST_RECIPIENTS", "")
         return [e.strip() for e in raw.split(",") if e.strip()]
-    return [conseiller_email] if conseiller_email else []
+    if isinstance(embedded_emails, str):  # rétrocompat : un seul e-mail passé en str
+        embedded_emails = [embedded_emails]
+    return list(dict.fromkeys(e for e in (embedded_emails or []) if e))
 
 
 def build_payload(html, to_email, sender, test, scheduled_at=None):
@@ -70,6 +77,7 @@ def build_payload(html, to_email, sender, test, scheduled_at=None):
         "to": [{"email": to_email}],
         "subject": subject,
         "htmlContent": html,
+        "params": {"EMAIL": to_email},  # substitue {{ params.EMAIL }} (lien avis), sans contact Brevo
     }
     if scheduled_at:
         payload["scheduledAt"] = scheduled_at
@@ -97,15 +105,15 @@ def run_send(in_dir, test=False, scheduled_at=None, proxy=None):
     with httpx.Client(timeout=30, proxy=proxy) as client:
         for fp in html_files:
             html = fp.read_text(encoding="utf-8")
-            m = re.search(r"<!--\s*to:\s*([^\s>]+)\s*-->", html)
-            conseiller_email = m.group(1) if m else None
-            for to in recipients_for(conseiller_email, test):
+            emails = re.findall(r"<!--\s*to:\s*([^\s>]+)\s*-->", html)  # tous les destinataires
+            tos = recipients_for(emails, test)
+            for to in tos:  # un envoi individuel par destinataire (chacun sa propre copie)
                 resp = _send_one(client, build_payload(html, to, sender, test, scheduled_at), api_key)
                 mid = resp.get("messageId") if isinstance(resp, dict) else None
                 if mid:
                     message_ids.append(mid)
                 sent += 1
-            if not recipients_for(conseiller_email, test):
+            if not tos:
                 skipped += 1
     mode = "programmé" if scheduled_at else "immédiat"
     via = " via proxy" if proxy else " (direct)"

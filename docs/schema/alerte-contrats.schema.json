@@ -1,0 +1,74 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Alerte fins de contrats IAE",
+  "type": "object",
+  "required": ["destinataires", "objet", "groupes"],
+  "properties": {
+    "destinataires": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["nom", "email"],
+        "properties": {
+          "nom": { "type": "string" },
+          "email": { "type": "string", "format": "email" },
+          "agence": { "type": ["string", "null"] }
+        }
+      }
+    },
+    "objet": { "type": "string" },
+    "intro": { "type": ["string", "null"] },
+    "remarques": { "type": ["array", "null"], "items": { "type": "string" } },
+    "groupes": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/groupe" }
+    }
+  },
+  "$defs": {
+    "richblock": {
+      "type": ["object", "null"],
+      "required": ["format", "content"],
+      "properties": {
+        "format": { "type": "string", "enum": ["markdown", "html"] },
+        "content": { "type": "string" }
+      }
+    },
+    "accompagnateur": {
+      "type": ["object", "null"],
+      "properties": {
+        "nom": { "type": "string" },
+        "email": { "type": ["string", "null"], "format": "email" },
+        "telephone": { "type": ["string", "null"] }
+      }
+    },
+    "item": {
+      "type": "object",
+      "required": ["nom"],
+      "properties": {
+        "nom": { "type": "string" },
+        "note": { "type": ["string", "null"] },
+        "accompagnateur": { "$ref": "#/$defs/accompagnateur" },
+        "url": { "type": ["string", "null"] },
+        "cta_label": { "type": ["string", "null"] }
+      }
+    },
+    "section": {
+      "type": "object",
+      "required": ["type", "items"],
+      "properties": {
+        "type": { "type": "string" },
+        "legende": { "type": ["string", "null"] },
+        "items": { "type": "array", "items": { "$ref": "#/$defs/item" } }
+      }
+    },
+    "groupe": {
+      "type": "object",
+      "required": ["titre", "sections"],
+      "properties": {
+        "titre": { "type": "string" },
+        "before_block": { "$ref": "#/$defs/richblock" },
+        "sections": { "type": "array", "items": { "$ref": "#/$defs/section" } }
+      }
+    }
+  }
+}

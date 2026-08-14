@@ -250,7 +250,7 @@ def _toc(beneficiaires):
 
 def render_doc(doc):
     c = doc["conseiller"]
-    intro = doc.get("intro") or default_intro(c)
+    intro = esc(doc["intro"]).replace("\n", "<br>") if doc.get("intro") else default_intro(c)
     remarques = doc.get("remarques") or DEFAULT_REMARQUES
     rem_html = "<br>".join(esc(r) for r in remarques)
     benefs_list = doc.get("beneficiaires", [])
