@@ -53,8 +53,8 @@ _LOGO_URL = "https://img.mailinblue.com/3949075/images/content_library/original/
 _AVIS_URL = "https://tally.so/r/Y5Bkrv?email={{ params.EMAIL }}"
 
 _SAVIEZ_VOUS = (
-    "À partir de la candidature, vous pouvez retrouver les contrats déclarés dans "
-    "l’extranet IAE 2.0 de l’ASP : cliquez sur « Afficher le PASS IAE » puis "
+    "À partir de la candidature, vous pouvez retrouver les contrats déclarés à "
+    "l’Agence de services et de paiement : cliquez sur « Afficher le PASS IAE » puis "
     "« Suivi des contrats IAE »."
 )
 
@@ -632,16 +632,20 @@ def render_doc(doc, variant=DEFAULT_VARIANT):
             rows.append(_render_group(g, i, v, with_year, first=(i == 0),
                                       last=(i == len(groupes) - 1)))
 
-    # bloc avis : de l'air sous le bouton, sinon il colle au filet suivant
+    # bloc avis : encart encadré orange, mis en avant (bordure + fond orangé + CTA orange)
     rows.append(
-        f'<tr><td style="border-top:1px solid {_RULE};padding:30px 0 34px;'
-        f'text-align:center;">'
+        f'<tr><td style="padding:28px 0 12px;">'
+        f'<table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>'
+        f'<td style="border:2px solid {_ORANGE};border-radius:{_R_SM};background:#fff7ef;'
+        f'padding:22px 24px;text-align:center;">'
+        f'<p style="margin:0 0 4px;font-family:{_FONT};font-size:17px;font-weight:700;'
+        f'color:{_INK};">Votre avis nous intéresse</p>'
         f'<p style="margin:0 0 16px;font-family:{_FONT};font-size:15px;line-height:1.6;'
         f'color:{_INK};">En 2 minutes, aidez-nous à améliorer ces alertes.</p>'
-        f'<a href="{_AVIS_URL}" style="display:inline-block;padding:12px 26px;'
-        f'background:{_BLUE};color:#ffffff;text-decoration:none;border-radius:{_R_XS};'
+        f'<a href="{_AVIS_URL}" style="display:inline-block;padding:13px 30px;'
+        f'background:{_ORANGE};color:#ffffff;text-decoration:none;border-radius:{_R_XS};'
         f'font-family:{_FONT};font-size:15px;font-weight:700;">Donner mon avis</a>'
-        f'</td></tr>')
+        f'</td></tr></table></td></tr>')
     if rem_html:
         rows.append(
             f'<tr><td style="border-top:1px solid {_RULE};padding:22px 0 0;">'
