@@ -17,7 +17,10 @@ Les vrais noms n'existent que dans le **CSV réel non-anonymisé** (fourni par l
 Pipeline `sps/` (CLI `uv run sps …`), une étape par module :
 - `sps/deanon.py` — JSON anonyme + CSV réel → JSON nominatif (`out/json-nom/`). **Substitution déterministe par clé `de_id`, aucun LLM.**
 - `sps/render.py` + `sps/template.py` — JSON → **un HTML par conseiller** (`out/html/`).
-- `sps/brevo.py` — envoi / envoi programmé / annulation via l'API Brevo.
+- `sps/render_contrats.py` — variante « alerte fins de contrats IAE » (rendu par structure).
+- `sps/render_structure.py` — variante « vue STRUCTURE IAE » (cartes-tableaux par segment). Lancer : `uv run python -m sps.render_structure [in.json out.html]`.
+- `sps/charte.py` — **charte + helpers partagés** (couleurs, logo, URL formulaire Tally, `esc`/`fr`/`mailto`, encart avis, CSS tableau responsive). Un seul endroit à modifier pour le commun ; chaque nouveau type d'e-mail = un `sps/render_<type>.py` qui l'importe.
+- `sps/brevo.py` — envoi / envoi programmé / annulation via l'API Brevo (**générique** : lit les `*.html`, envoie une copie par `<!-- to: -->`, substitue `{{ params.EMAIL }}`).
 - `sps/schema.py` + `docs/schema/email.schema.json` — contrat JSON (donné à l'agent amont).
 - `sps/convert.py` — **adaptateur legacy** MD→JSON, **plus le chemin nominal** (l'entrée attendue est du JSON).
 - `data/` — entrées **sensibles, non versionnées**. `out/` — entrées JSON + sorties (gitignoré).
