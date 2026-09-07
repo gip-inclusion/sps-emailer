@@ -6,7 +6,7 @@ carte-tableau : PASS IAE | Suivi interne | Prescripteur habilité, empilée sur 
 
 Charte et helpers communs : voir sps/charte.py.
 Lancer :  uv run python -m sps.render_structure [in.json out.html]
-          (défaut : out/structure/exemple.json → out/structure/exemple.html)
+          (défaut : out/SIAE-fins-contrats/SIAE-fins-contrats.json → ….html)
 """
 import json
 import re
@@ -194,7 +194,8 @@ Le statut du PASS IAE et le contact prescripteur sont donnés à titre indicatif
 </table></td></tr></table></body></html>"""
 
 
-def run_render(in_path="out/structure/exemple.json", out_path="out/structure/exemple.html"):
+def run_render(in_path="out/SIAE-fins-contrats/SIAE-fins-contrats.json",
+               out_path="out/SIAE-fins-contrats/SIAE-fins-contrats.html"):
     doc = json.loads(Path(in_path).read_text(encoding="utf-8"))
     Path(out_path).write_text(render(doc), encoding="utf-8")
     print(f"écrit : {out_path}")
