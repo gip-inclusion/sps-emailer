@@ -2,7 +2,7 @@
 
 Un seul endroit pour les couleurs, la police, le logo, l'URL du formulaire d'avis et les
 petits helpers d'échappement/formatage, réutilisés par les renderers d'e-mails
-(`render_structure`, et à terme `render_contrats`/`render`). Modifier le logo ou l'URL Tally
+(`render_structure`, et à terme `render_prescripteurs`/`render`). Modifier le logo ou l'URL Tally
 ici plutôt que dans chaque renderer.
 
 Couleurs : bleu France #000091, accent orange #e57200 ; police Arial.
