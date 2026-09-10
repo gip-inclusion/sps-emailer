@@ -40,6 +40,16 @@ STACK_TABLE_CSS = """@media only screen and (max-width:480px){
 }"""
 
 
+# Segments d'action, partagés par les e-mails « fins de contrats » (vue structure et vue
+# prescripteur). urgence -> (libellé, couleur texte/bordure, fond clair). RANK = ordre d'affichage.
+URGENCE = {
+    "critique": ("Urgence critique", "#b91c1c", "#fdecea"),
+    "élevée":   ("Urgence élevée",   "#c2410c", "#fff3e6"),
+    "normale":  ("À traiter",        BLUE,      TINT),
+}
+RANK = {"critique": 0, "élevée": 1, "normale": 2}
+
+
 def esc(s):
     return _html.escape(str(s)) if s is not None else ""
 
@@ -61,6 +71,27 @@ def link(url, txt, color=BLUE):
 
 def mailto(email, color=BLUE):
     return f'<a href="mailto:{esc(email)}" style="color:{color};text-decoration:none;">{esc(email)}</a>'
+
+
+def contract_table(cols):
+    """Tableau d'un contrat. `cols` = liste de (libellé, largeur %, html_cellule).
+    Colonnes côte à côte sur desktop ; empilées avec libellés sur mobile (cf. STACK_TABLE_CSS)."""
+    th = (f'font-size:11px;font-weight:700;color:{MUTE};text-transform:uppercase;'
+          f'letter-spacing:.04em;text-align:left;padding:8px 12px;background:{TINT};'
+          f'border-bottom:1px solid {RULE};')
+    td = f'font-size:13px;color:{INK};line-height:1.5;padding:11px 12px;vertical-align:top;'
+    sep = 'border-left:1px solid #eef2f7;'
+
+    def lbl(t):
+        return (f'<span class="ct-lbl" style="display:none;font-size:11px;font-weight:700;color:{MUTE};'
+                f'text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px;">{esc(t)}</span>')
+    heads = "".join(f'<th style="{th}{sep if i else ""}width:{w}%;">{esc(label)}</th>'
+                    for i, (label, w, _) in enumerate(cols))
+    datas = "".join(f'<td class="ct-td" style="{td}{sep if i else ""}">{lbl(label)}{cell}</td>'
+                    for i, (label, w, cell) in enumerate(cols))
+    return (f'<table role="presentation" width="100%" cellpadding="0" cellspacing="0" '
+            f'style="border-collapse:collapse;border:1px solid {RULE};table-layout:fixed;">'
+            f'<tr class="ct-head">{heads}</tr><tr class="ct-tr">{datas}</tr></table>')
 
 
 def avis_encart(titre="Votre avis nous intéresse",

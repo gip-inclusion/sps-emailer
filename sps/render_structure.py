@@ -13,18 +13,12 @@ import re
 import sys
 from pathlib import Path
 
-from sps.charte import (BLUE, ORANGE, INK, MUTE, RULE, TINT, FONT, LOGO_URL,
-                        STACK_TABLE_CSS, esc, fr, clean_nom, mailto, avis_encart)
+from sps.charte import (BLUE, ORANGE, INK, MUTE, RULE, TINT, FONT, LOGO_URL, URGENCE, RANK,
+                        STACK_TABLE_CSS, esc, fr, clean_nom, mailto, avis_encart, contract_table)
 
 _W = 640  # largeur du conteneur (px)
-
-# urgence -> (libellé, couleur texte/bordure, fond clair)
-_URGENCE = {
-    "critique": ("Urgence critique", "#b91c1c", "#fdecea"),
-    "élevée":   ("Urgence élevée",   "#c2410c", "#fff3e6"),
-    "normale":  ("À traiter",        BLUE,      TINT),
-}
-_RANK = {"critique": 0, "élevée": 1, "normale": 2}
+_URGENCE = URGENCE
+_RANK = RANK
 
 
 def _admins_block(po):
@@ -87,15 +81,6 @@ def _contract_block(c, first):
     recond = c.get("num_reconduction") or 0
     recond_txt = f" · {recond}ᵉ reconduction" if recond else ""
     cid = c.get("emplois_candidat_id") or c.get("contrat_id_ctr")
-    th = (f'font-size:11px;font-weight:700;color:{MUTE};text-transform:uppercase;'
-          f'letter-spacing:.04em;text-align:left;padding:8px 12px;background:{TINT};'
-          f'border-bottom:1px solid {RULE};')
-    td = f'font-size:13px;color:{INK};line-height:1.5;padding:11px 12px;vertical-align:top;'
-    sep = 'border-left:1px solid #eef2f7;'
-
-    def lbl(t):  # libellé de colonne rappelé au-dessus de chaque cellule quand elles s'empilent (mobile)
-        return (f'<span class="ct-lbl" style="display:none;font-size:11px;font-weight:700;color:{MUTE};'
-                f'text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px;">{esc(t)}</span>')
     cp = c.get("contact_prolongation") or {}
     cand = ""
     if cp.get("lien_candidature"):
@@ -103,25 +88,18 @@ def _contract_block(c, first):
                 f'<a href="{esc(cp["lien_candidature"])}" style="display:inline-block;padding:8px 15px;'
                 f'background:#eff2fb;color:{BLUE};text-decoration:none;border:1px solid #cdd7ee;'
                 f'border-radius:4px;font-size:13px;font-weight:700;">Voir la candidature</a></div>')
+    table = contract_table([
+        ("PASS IAE", 29, _pass_cell(c)),
+        ("Suivi interne", 23, _suivi_cell(c)),
+        ("Prescripteur habilité", 48, _presc_cell(c)),
+    ])
     return (
         f'<div style="{top}">'
         f'<div style="font-weight:700;color:{INK};font-size:15px;">'
         f'Contrat #{esc(c.get("contrat_id_ctr"))} — fin le {fr(c.get("date_fin_contrat"))}</div>'
         f'<div style="font-size:12px;color:{MUTE};margin:1px 0 8px;">'
         f'{int(c.get("duree_mois") or 0)} mois{recond_txt} · candidature #{esc(cid)}</div>'
-        f'{cand}'
-        f'<table role="presentation" width="100%" cellpadding="0" cellspacing="0" '
-        f'style="border-collapse:collapse;border:1px solid {RULE};table-layout:fixed;">'
-        f'<tr class="ct-head">'
-        f'<th style="{th}width:29%;">PASS IAE</th>'
-        f'<th style="{th}{sep}width:23%;">Suivi interne</th>'
-        f'<th style="{th}{sep}width:48%;">Prescripteur habilité</th>'
-        f'</tr><tr class="ct-tr">'
-        f'<td class="ct-td" style="{td}">{lbl("PASS IAE")}{_pass_cell(c)}</td>'
-        f'<td class="ct-td" style="{td}{sep}">{lbl("Suivi interne")}{_suivi_cell(c)}</td>'
-        f'<td class="ct-td" style="{td}{sep}">{lbl("Prescripteur habilité")}{_presc_cell(c)}</td>'
-        f'</tr></table>'
-        f'</div>')
+        f'{cand}{table}</div>')
 
 
 def _segment_card(seg):
