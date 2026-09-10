@@ -145,7 +145,7 @@ def render(e):
     verbe = "arrive" if nb == 1 else "arrivent"
     intro = (f"Bonjour,<br><br><strong>{nb} {mot} IAE</strong> {verbe} à échéance entre le 14 "
              f"et le 30 septembre 2026 au sein de votre structure <strong>{esc(nom)}</strong>.<br>"
-             f"Retrouvez ci-dessous le détail par prescripteur, avec les actions à mener pour chaque situation.")
+             f"Retrouvez ci-dessous le détail par prescripteur.")
     groupes = "".join(_groupe(g, e.get("show_accompagnateur")) for g in e.get("groupes", []))
     foot = e.get("footer_questionnaire") or {}
     legal = esc(e.get("legal") or "").replace(" Vous le recevez", "<br>\nVous le recevez")
