@@ -17,11 +17,15 @@ def main(argv=None):
     p = sub.add_parser("send", help="Envoi via Brevo")
     p.add_argument("indir"); p.add_argument("--test", action="store_true")
     p.add_argument("--via", help="Proxy egress (ex. socks5h://127.0.0.1:1080), sinon BREVO_PROXY")
+    p.add_argument("--tag", action="append", metavar="TAG",
+                   help="tag de campagne Brevo (répétable) pour filtrer les stats par tag")
 
     p = sub.add_parser("schedule", help="Envoi programmé via Brevo (scheduledAt)")
     p.add_argument("indir"); p.add_argument("--at", required=True)
     p.add_argument("--test", action="store_true")
     p.add_argument("--via", help="Proxy egress (ex. socks5h://127.0.0.1:1080), sinon BREVO_PROXY")
+    p.add_argument("--tag", action="append", metavar="TAG",
+                   help="tag de campagne Brevo (répétable) pour filtrer les stats par tag")
 
     p = sub.add_parser("cancel", help="Annule un envoi programmé Brevo (par runId, ou messageId)")
     p.add_argument("run_id")
@@ -48,7 +52,8 @@ def main(argv=None):
         from sps.brevo import run_send
         run_send(args.indir, test=args.test,
                  scheduled_at=getattr(args, "at", None),
-                 proxy=getattr(args, "via", None))
+                 proxy=getattr(args, "via", None),
+                 tags=getattr(args, "tag", None))
     elif args.cmd == "cancel":
         from sps.brevo import run_cancel
         run_cancel(args.run_id, proxy=getattr(args, "via", None))

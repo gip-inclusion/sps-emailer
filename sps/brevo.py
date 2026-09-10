@@ -68,7 +68,7 @@ def recipients_for(embedded_emails, test):
     return list(dict.fromkeys(e for e in (embedded_emails or []) if e))
 
 
-def build_payload(html, to_email, sender, test, scheduled_at=None):
+def build_payload(html, to_email, sender, test, scheduled_at=None, tags=None):
     subject = _title(html)
     if test:
         subject = f"[TEST] {subject}"
@@ -79,6 +79,8 @@ def build_payload(html, to_email, sender, test, scheduled_at=None):
         "htmlContent": html,
         "params": {"EMAIL": to_email},  # substitue {{ params.EMAIL }} (lien avis), sans contact Brevo
     }
+    if tags:  # tag(s) de campagne : filtrage direct des stats Brevo (events/report ?tags=…),
+        payload["tags"] = tags  # robuste même en programmé (le messageId change à l'envoi)
     if scheduled_at:
         payload["scheduledAt"] = scheduled_at
     return payload
@@ -92,7 +94,7 @@ def _send_one(client, payload, api_key):
     return r.json()
 
 
-def run_send(in_dir, test=False, scheduled_at=None, proxy=None):
+def run_send(in_dir, test=False, scheduled_at=None, proxy=None, tags=None):
     if scheduled_at:
         validate_scheduled_at(scheduled_at)
     api_key = os.environ["BREVO_API_KEY"]
@@ -108,7 +110,7 @@ def run_send(in_dir, test=False, scheduled_at=None, proxy=None):
             emails = re.findall(r"<!--\s*to:\s*([^\s>]+)\s*-->", html)  # tous les destinataires
             tos = recipients_for(emails, test)
             for to in tos:  # un envoi individuel par destinataire (chacun sa propre copie)
-                resp = _send_one(client, build_payload(html, to, sender, test, scheduled_at), api_key)
+                resp = _send_one(client, build_payload(html, to, sender, test, scheduled_at, tags), api_key)
                 mid = resp.get("messageId") if isinstance(resp, dict) else None
                 if mid:
                     message_ids.append(mid)
@@ -117,7 +119,8 @@ def run_send(in_dir, test=False, scheduled_at=None, proxy=None):
                 skipped += 1
     mode = "programmé" if scheduled_at else "immédiat"
     via = " via proxy" if proxy else " (direct)"
-    print(f"send ({mode}{via}): {sent} envoi(s), {skipped} ignoré(s)")
+    tag_txt = f" [tags: {', '.join(tags)}]" if tags else ""
+    print(f"send ({mode}{via}): {sent} envoi(s), {skipped} ignoré(s){tag_txt}")
     if scheduled_at:
         run_id = str(uuid.uuid4())
         _log_schedule(_SCHEDULE_LOG, run_id, scheduled_at, message_ids, src)

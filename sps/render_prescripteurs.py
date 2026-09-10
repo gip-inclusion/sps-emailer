@@ -172,6 +172,16 @@ def _groupe(g):
         f'    </div>\n')
 
 
+def _simple_objet(e):
+    """Sujet simplifié : « N contrats IAE arrivent à échéance en septembre » (N = nb de contrats)."""
+    n = sum(len(ss.get("items", []))
+            for g in e.get("groupes", []) for sec in g.get("sections", [])
+            for ss in sec.get("sub_sections", []))
+    mot = "contrat" if n == 1 else "contrats"
+    verbe = "arrive" if n == 1 else "arrivent"
+    return f"{n} {mot} IAE {verbe} à échéance en septembre"
+
+
 def _avis_link(lien):
     """Force le paramètre email du lien avis à {{ params.EMAIL }} (substitué par Brevo au vrai
     destinataire de chaque copie) au lieu de l'e-mail pré-calculé du conseiller principal."""
@@ -194,7 +204,7 @@ def render(e):
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>{esc(e.get('objet'))}</title>
+<title>{esc(_simple_objet(e))}</title>
 <style>
 {_STYLE}
 </style>
